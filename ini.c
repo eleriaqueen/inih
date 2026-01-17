@@ -59,6 +59,18 @@ static char* ini_lskip(const char* s)
     return (char*)s;
 }
 
+/* Strip quotes from single and double quoted strings */
+static char* unquote(char* s)
+{
+    int l = strlen(s);
+    if (l && s[0] == s[l - 1] && (s[0] == '\'' || s[0] == '"'))
+    {
+        s[l - 1] = '\0';
+        s++;
+    }
+    return s;
+}
+
 /* Return pointer to first char (of chars) or inline comment in given string,
    or pointer to NUL at end of string if neither found. Inline comment must
    be prefixed by a whitespace character to register as a comment. */
@@ -231,6 +243,7 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
 #endif
                 value = ini_lskip(value);
                 ini_rstrip(value, end);
+                value = unquote(value);
 
 #if INI_ALLOW_MULTILINE
                 ini_strncpy0(prev_name, name, sizeof(prev_name));
